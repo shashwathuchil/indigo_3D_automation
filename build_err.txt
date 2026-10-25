@@ -1,0 +1,4 @@
+D:\code\3d\build_a320.py:20: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\code\3d\build_a320.py:475: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  bpy.context.scene.world = w; w.use_nodes = True

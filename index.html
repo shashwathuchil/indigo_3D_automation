@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>IndiGo A320neo — Automated Flight Departure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --indigo-blue: #050e52;
+      --indigo-cyan: #1fa1c9;
+      --indigo-light-cyan: #52c9ee;
+      --bg-dark: #06132b;
+      --glass-bg: rgba(8, 24, 58, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-hover: rgba(14, 38, 88, 0.85);
+      --text-primary: #ffffff;
+      --text-secondary: #9cb5d9;
+      --text-muted: #5e79a3;
+      --accent-green: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* 3D Canvas Background (Strictly NO mouse play) */
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 1;
+      pointer-events: none;
+    }
+    #canvas-container canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Full-Screen UI Layer */
+    .app-viewport {
+      position: relative;
+      z-index: 10;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(16px, 3vw, 32px);
+      pointer-events: none;
+    }
+
+    /* ── 1. Top Navigation Bar ─────────────────────────────────────────── */
+    .top-nav {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+    .brand-logo {
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #1fa1c9 0%, #0c7fa3 100%);
+      color: #050e52;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(31, 161, 201, 0.3);
+    }
+
+    .nav-status-pill {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      pointer-events: auto;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* ── 2. Bottom Floating Telemetry & Hero Card ──────────────────────── */
+    /* Positioned bottom-left on desktop, bottom-docked on mobile so plane path remains clear */
+    .bottom-layout {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .telemetry-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: clamp(18px, 2.5vw, 26px);
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      pointer-events: auto;
+      transition: border-color 0.3s ease;
+    }
+    .telemetry-card:hover {
+      border-color: rgba(31, 161, 201, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .flight-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--indigo-light-cyan);
+      letter-spacing: 0.5px;
+    }
+    .phase-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: rgba(31, 161, 201, 0.18);
+      border: 1px solid rgba(31, 161, 201, 0.35);
+      color: var(--indigo-light-cyan);
+      transition: all 0.3s ease;
+    }
+
+    .flight-title {
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #cae3ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .flight-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* Live Telemetry Data Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: rgba(4, 14, 38, 0.55);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .metric-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .metric-unit {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Flight Phase Progress Timeline */
+    .timeline-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    .timeline-progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1fa1c9, #52c9ee);
+      border-radius: 2px;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 10px #1fa1c9;
+    }
+
+    /* Action Buttons */
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-primary {
+      flex: 1;
+      height: 44px;
+      background: linear-gradient(135deg, #1fa1c9 0%, #0f89ae 100%);
+      color: #050e52;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 18px rgba(31, 161, 201, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #32b5dd 0%, #1598bf 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(31, 161, 201, 0.5);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-ghost {
+      height: 44px;
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    /* Right Bottom Tech Info (Desktop Only) */
+    .tech-pill {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+    }
+    .tech-pill b {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* ── 3. Loading Overlay ────────────────────────────────────────────── */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #051026;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .spinner-ring {
+      width: 44px;
+      height: 44px;
+      border: 3.5px solid rgba(31, 161, 201, 0.15);
+      border-top-color: var(--indigo-cyan);
+      border-radius: 50%;
+      animation: spin 0.85s infinite linear;
+    }
+    .loading-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* ── 4. Responsive Mobile Breakpoints ──────────────────────────────── */
+    @media (max-width: 768px) {
+      .app-viewport {
+        padding: 16px;
+      }
+      .brand-logo {
+        font-size: 22px;
+      }
+      .nav-status-pill span:not(.pulse-dot) {
+        display: none;
+      }
+      .nav-status-pill::after {
+        content: "LIVE";
+        font-size: 11px;
+        font-weight: 700;
+        color: #ffffff;
+      }
+      .telemetry-card {
+        max-width: 100%;
+        padding: 18px 20px;
+        border-radius: 18px;
+      }
+      .flight-title {
+        font-size: 22px;
+      }
+      .flight-desc {
+        display: none; /* Hide paragraph on small mobile to maximize 3D visibility */
+      }
+      .metrics-grid {
+        margin-bottom: 16px;
+        padding: 10px 12px;
+      }
+      .metric-val {
+        font-size: 14px;
+      }
+      .tech-pill {
+        display: none;
+      }
+    }
+  </style>
+
+  <!-- Three.js + GLTF + Draco -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+
+  <!-- Loading State -->
+  <div id="loading" class="loading-overlay">
+    <div class="spinner-ring"></div>
+    <div class="loading-label">Initializing Flight Trajectory & Avionics...</div>
+  </div>
+
+  <!-- 3D Canvas Container (Non-Interactive, fixed view) -->
+  <div id="canvas-container"></div>
+
+  <!-- Responsive Flight Dashboard UI -->
+  <div class="app-viewport">
+    
+    <!-- Top Navigation -->
+    <header class="top-nav">
+      <div class="brand-cluster">
+        <div class="brand-logo">IndiGo</div>
+        <div class="brand-badge">A320neo</div>
+      </div>
+
+      <div class="nav-status-pill">
+        <span class="pulse-dot"></span>
+        <span>FLIGHT 6E-2026 • RWY 27R</span>
+      </div>
+    </header>
+
+    <!-- Bottom Layout (Docked away from top-left plane path) -->
+    <footer class="bottom-layout">
+      
+      <!-- Telemetry Dashboard Card -->
+      <section class="telemetry-card">
+        <div class="card-header">
+          <div class="flight-tag">DEL → BLR • IFR</div>
+          <div class="phase-badge" id="phase-badge">TAXI / ROLL</div>
+        </div>
+
+        <h2 class="flight-title" id="phase-title">Cleared for Takeoff</h2>
+        <p class="flight-desc">Automated departure flight path featuring aerodynamic wingtip vortex contrails and TOGA turbofan thrust.</p>
+
+        <!-- Real-Time Flight Telemetry Grid -->
+        <div class="metrics-grid">
+          <div class="metric-cell">
+            <span class="metric-label">Airspeed</span>
+            <div class="metric-val"><span id="val-speed">0</span> <span class="metric-unit">KTS</span></div>
+          </div>
+          <div class="metric-cell">
+            <span class="metric-label">Altitude</span>
+            <div class="metric-val"><span id="val-alt">0</span> <span class="metric-unit">FT</span></div>
+          </div>
+          <div class="metric-cell">
+            <span class="metric-label">Pitch</span>
+            <div class="metric-val"><span id="val-pitch">+0.0</span><span class="metric-unit">°</span></div>
+          </div>
+        </div>
+
+        <!-- Flight Timeline Progress -->
+        <div class="timeline-container">
+          <div class="timeline-progress" id="timeline-bar"></div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="action-group">
+          <button class="btn-primary" id="btn-replay">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 4v6h6m-3.5 10a9 9 0 1 0-2.3-8.8L1 10"/>
+            </svg>
+            Replay Takeoff
+          </button>
+          <button class="btn-ghost" id="btn-speed" title="Toggle Speed">1.0×</button>
+        </div>
+      </section>
+
+      <!-- Desktop Tech Badge -->
+      <div class="tech-pill">
+        <span>Mesh: <b>7.5k Tris (Draco)</b></span>
+        <span>•</span>
+        <span>Size: <b>146 KB</b></span>
+        <span>•</span>
+        <span>Engine: <b>CFM LEAP-1A</b></span>
+      </div>
+
+    </footer>
+
+  </div>
+
+  <script>
+    const container = document.getElementById('canvas-container');
+    const loadingScreen = document.getElementById('loading');
+    
+    // UI Elements for live telemetry syncing
+    const phaseBadge = document.getElementById('phase-badge');
+    const phaseTitle = document.getElementById('phase-title');
+    const valSpeed = document.getElementById('val-speed');
+    const valAlt = document.getElementById('val-alt');
+    const valPitch = document.getElementById('val-pitch');
+    const timelineBar = document.getElementById('timeline-bar');
+    const btnReplay = document.getElementById('btn-replay');
+    const btnSpeed = document.getElementById('btn-speed');
+
+    // ── 1. Three.js Scene Setup (Fixed Viewport, NO OrbitControls) ─────────
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x081c3d);
+    // Soft distant atmospheric horizon (no close clipping fog)
+    scene.fog = new THREE.Fog(0x081c3d, 450, 1500);
+
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      powerPreference: 'high-performance',
+      alpha: false 
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
+    container.appendChild(renderer.domElement);
+
+    // ── 2. Fixed Cinematic Camera Setup (Framed for Runway Takeoff) ───────
+    // Positions camera behind & to side of runway: plane is clearly visible on runway and climbs into sky
+    const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.5, 3000);
+    const initialCamPos = new THREE.Vector3(-50.0, 16.0, -30.0);
+    const initialTarget = new THREE.Vector3(10.0, 6.0, 40.0);
+    
+    camera.position.copy(initialCamPos);
+    camera.lookAt(initialTarget);
+    const currentTarget = initialTarget.clone();
+
+    // ── 3. High-Altitude Atmospheric Lighting ────────────────────────────
+    const hemiLight = new THREE.HemisphereLight(0xe8f4ff, 0x07152d, 1.6);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfffaec, 3.8);
+    sunLight.position.set(-60, 100, 40);
+    scene.add(sunLight);
+
+    // Tail & wing specular backlight
+    const backLight = new THREE.DirectionalLight(0xaad4ff, 2.2);
+    backLight.position.set(0, 30, -80);
+    scene.add(backLight);
+
+    const fillLight = new THREE.DirectionalLight(0x72b4ff, 1.4);
+    fillLight.position.set(50, -20, 20);
+    scene.add(fillLight);
+
+    // ── 4. Load Draco-Compressed Animated GLB ────────────────────────────
+    let mixer, animations = [], planeModel;
+    let animSpeed = 1.0;
+    const ANIM_DURATION = 6.0; // 180 frames @ 30fps = 6 seconds
+
+    const dracoLoader = new THREE.DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+
+    const gltfLoader = new THREE.GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+
+    gltfLoader.load('models/indigo-a320/model.glb', (gltf) => {
+      planeModel = gltf.scene;
+      scene.add(planeModel);
+
+      mixer = new THREE.AnimationMixer(planeModel);
+      animations = gltf.animations;
+
+      // Start Takeoff Sequence automatically once loaded
+      startTakeoff();
+
+      // Dismiss loading screen with smooth fade
+      setTimeout(() => {
+        loadingScreen.classList.add('hidden');
+      }, 350);
+
+    }, undefined, (err) => {
+      console.error('Error loading GLB:', err);
+      loadingScreen.innerHTML = '<div style="color:#ef4444;font-weight:600">Failed to load flight asset: ' + err.message + '</div>';
+    });
+
+    // ── 5. Flight Sequence Manager ─────────────────────────────────────────
+    let isTakeoffActive = false;
+    let loopTimeout = null;
+
+    function startTakeoff() {
+      if (!mixer || !animations.length) return;
+
+      isTakeoffActive = true;
+      mixer.stopAllAction();
+      clearTimeout(loopTimeout);
+
+      // Reset camera to initial left-top orientation
+      camera.position.copy(initialCamPos);
+      currentTarget.copy(initialTarget);
+      camera.lookAt(currentTarget);
+
+      // Play all 12 synchronized actions
+      animations.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+        action.reset();
+        action.timeScale = animSpeed;
+        action.setLoop(THREE.LoopOnce);
+        action.clampWhenFinished = true;
+        action.play();
+      });
+
+      // Schedule continuous auto-loop after departure sequence finishes
+      loopTimeout = setTimeout(() => {
+        startTakeoff();
+      }, (ANIM_DURATION / animSpeed + 2.4) * 1000);
+    }
+
+    // Replay Button
+    btnReplay.addEventListener('click', () => {
+      startTakeoff();
+    });
+
+    // Speed Toggle Button (1.0x <-> 0.5x Slow-Motion)
+    btnSpeed.addEventListener('click', () => {
+      animSpeed = (animSpeed === 1.0) ? 0.5 : 1.0;
+      btnSpeed.textContent = animSpeed.toFixed(1) + '×';
+      if (mixer) {
+        mixer.timeScale = animSpeed;
+      }
+    });
+
+    // Responsive Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ── 6. Real-Time Telemetry & Render Loop (60 FPS) ──────────────────────
+    const clock = new THREE.Clock();
+
+    function updateTelemetry(timeProgress) {
+      // timeProgress is 0.0 (runway start) to 1.0 (climb out)
+      timelineBar.style.width = (timeProgress * 100).toFixed(1) + '%';
+
+      if (timeProgress < 0.28) {
+        // Phase 1: Takeoff Roll
+        phaseBadge.textContent = 'TAXI / ROLL';
+        phaseBadge.style.color = '#1fa1c9';
+        phaseTitle.textContent = 'Takeoff Roll • Runway 27R';
+        
+        const spd = Math.round(timeProgress / 0.28 * 145);
+        valSpeed.textContent = spd;
+        valAlt.textContent = '0';
+        valPitch.textContent = '+0.0';
+      } 
+      else if (timeProgress < 0.45) {
+        // Phase 2: Rotation (Vr)
+        phaseBadge.textContent = 'ROTATION (V_R)';
+        phaseBadge.style.color = '#f59e0b';
+        phaseTitle.textContent = 'Rotating • Nose Pitch Up';
+
+        const t = (timeProgress - 0.28) / (0.45 - 0.28);
+        const spd = Math.round(145 + t * 25);
+        valSpeed.textContent = spd;
+        valAlt.textContent = Math.round(t * 80);
+        valPitch.textContent = '+' + (t * 12.5).toFixed(1);
+      } 
+      else if (timeProgress < 0.85) {
+        // Phase 3: Airborne Climb (V2)
+        phaseBadge.textContent = 'AIRBORNE • CLIMB';
+        phaseBadge.style.color = '#10b981';
+        phaseTitle.textContent = 'Climbing Departure';
+
+        const t = (timeProgress - 0.45) / (0.85 - 0.45);
+        const spd = Math.round(170 + t * 90);
+        valSpeed.textContent = spd;
+        valAlt.textContent = Math.round(80 + t * 2400);
+        valPitch.textContent = '+' + (12.5 - t * 2.5).toFixed(1);
+      } 
+      else {
+        // Phase 4: En Route
+        phaseBadge.textContent = 'EN ROUTE • CRUISE';
+        phaseBadge.style.color = '#38bdf8';
+        phaseTitle.textContent = 'En Route • Departure Complete';
+
+        valSpeed.textContent = '290';
+        valAlt.textContent = '4,500';
+        valPitch.textContent = '+10.0';
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+
+      if (mixer) {
+        mixer.update(delta);
+
+        // Calculate normalized animation progress (0.0 to 1.0)
+        let activeTime = 0;
+        if (animations.length && mixer.clipAction(animations[0])) {
+          activeTime = mixer.clipAction(animations[0]).time;
+        }
+        const progress = Math.min(Math.max(activeTime / ANIM_DURATION, 0), 1.0);
+        updateTelemetry(progress);
+
+        // Smooth cinematic tracking follow as aircraft ascends
+        if (planeModel && isTakeoffActive) {
+          const planeWorldPos = new THREE.Vector3();
+          const airplane = planeModel.getObjectByName('indigo_a320') || planeModel;
+          airplane.getWorldPosition(planeWorldPos);
+
+          const targetLook = new THREE.Vector3(
+            initialTarget.x + planeWorldPos.x * 0.35,
+            initialTarget.y + planeWorldPos.y * 0.65,
+            initialTarget.z + planeWorldPos.z * 0.55
+          );
+          currentTarget.lerp(targetLook, 0.05);
+          camera.lookAt(currentTarget);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+00:03.360  render           | Saved: 'D:\code\3d\models\indigo-a320\render.png'
+Fuselage built with authentic UV mapping
+Wings built with supercritical aerofoils
+Flap track fairings built
+Curved sharklets built
+CFM LEAP-1A engines built with chrome lips and pylons
+Vertical stabilizer built with logo UVs
+Horizontal stabilizers built
+Ancillary details built
+Rendering showcase image...
+Showcase render saved to: D:/code/3d/models/indigo-a320/render.png
+Info: Packed 4 file(s)
+Info: Saved as "model.blend"
+Saved model.blend
+INFO Draco is available, use library at D:\blender\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at D:\blender\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+23:51:41 | INFO: Starting glTF 2.0 export
+23:51:41 | INFO: Extracting primitive: Cylinder.007
+23:51:41 | INFO: Primitives created: 1
+23:51:41 | INFO: Extracting primitive: Cylinder.003
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cylinder
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cylinder.004
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cylinder.001
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cylinder.005
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cylinder.002
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: engine_L_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Circle.001
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Torus.001
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: engine_L_pylon_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cone.001
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: engine_R_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Circle
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Torus
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: engine_R_pylon_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cone
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: fin_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: fuselage_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: hstab_L_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: hstab_R_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: Cylinder.006
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: sharklet_L_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: sharklet_R_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: wing_L_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Extracting primitive: wing_R_mesh
+23:51:42 | INFO: Primitives created: 1
+23:51:42 | INFO: Draco encoder: Encoding mesh apu_exhaust.
+23:51:42 | INFO: Draco encoder: Encoding mesh canoe_inboard_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh canoe_inboard_R.
+23:51:42 | INFO: Draco encoder: Encoding mesh canoe_mid_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh canoe_mid_R.
+23:51:42 | INFO: Draco encoder: Encoding mesh canoe_outboard_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh canoe_outboard_R.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_L_fan.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_L_lip.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_L_pylon.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_L_spinner.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_R.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_R_fan.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_R_lip.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_R_pylon.
+23:51:42 | INFO: Draco encoder: Encoding mesh engine_R_spinner.
+23:51:42 | INFO: Draco encoder: Encoding mesh fin.
+23:51:42 | INFO: Draco encoder: Encoding mesh fuselage.
+23:51:42 | INFO: Draco encoder: Encoding mesh hstab_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh hstab_R.
+23:51:42 | INFO: Draco encoder: Encoding mesh satcom_dome.
+23:51:42 | INFO: Draco encoder: Encoding mesh sharklet_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh sharklet_R.
+23:51:42 | INFO: Draco encoder: Encoding mesh wing_L.
+23:51:42 | INFO: Draco encoder: Encoding mesh wing_R.
+23:51:42 | INFO: Finished glTF 2.0 export in 0.8079409599304199 s
+
+GLB Exported Successfully! Size: 117816 bytes (115.1 KB)
+Total Triangles: 7562
+PIPELINE COMPLETED SUCCESSFULLY!
+Blender 5.2.3 LTS (hash e13b728c6880 built 2026-10-22 01:37:16)
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 96 vertices, 180 indices, raw size: 3432, encoded size: 803, compression ratio: 4.27
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 66 vertices, 180 indices, raw size: 2472, encoded size: 651, compression ratio: 3.80
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 66 vertices, 180 indices, raw size: 2472, encoded size: 651, compression ratio: 3.80
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 66 vertices, 180 indices, raw size: 2472, encoded size: 651, compression ratio: 3.80
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 66 vertices, 180 indices, raw size: 2472, encoded size: 651, compression ratio: 3.80
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 66 vertices, 180 indices, raw size: 2472, encoded size: 651, compression ratio: 3.80
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 66 vertices, 180 indices, raw size: 2472, encoded size: 651, compression ratio: 3.80
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 259 vertices, 1296 indices, raw size: 10880, encoded size: 1945, compression ratio: 5.59
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 37 vertices, 108 indices, raw size: 1400, encoded size: 487, compression ratio: 2.87
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 481 vertices, 2592 indices, raw size: 20576, encoded size: 3248, compression ratio: 6.33
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 6 vertices, 18 indices, raw size: 180, encoded size: 149, compression ratio: 1.21
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 49 vertices, 138 indices, raw size: 1844, encoded size: 700, compression ratio: 2.63
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 259 vertices, 1296 indices, raw size: 10880, encoded size: 1945, compression ratio: 5.59
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 37 vertices, 108 indices, raw size: 1400, encoded size: 487, compression ratio: 2.87
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 481 vertices, 2592 indices, raw size: 20576, encoded size: 3248, compression ratio: 6.33
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 6 vertices, 18 indices, raw size: 180, encoded size: 149, compression ratio: 1.21
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 49 vertices, 138 indices, raw size: 1844, encoded size: 700, compression ratio: 2.63
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 96 vertices, 426 indices, raw size: 3924, encoded size: 979, compression ratio: 4.01
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 1688 vertices, 9204 indices, raw size: 72360, encoded size: 7090, compression ratio: 10.21
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 80 vertices, 330 indices, raw size: 2196, encoded size: 689, compression ratio: 3.19
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 80 vertices, 330 indices, raw size: 2196, encoded size: 690, compression ratio: 3.18
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 98 vertices, 276 indices, raw size: 3688, encoded size: 928, compression ratio: 3.97
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 96 vertices, 426 indices, raw size: 2772, encoded size: 776, compression ratio: 3.57
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 96 vertices, 426 indices, raw size: 2772, encoded size: 776, compression ratio: 3.57
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 192 vertices, 852 indices, raw size: 7816, encoded size: 1566, compression ratio: 4.99
+DracoEncoder | Preserve triangle order: no
+DracoEncoder | Encoded 192 vertices, 852 indices, raw size: 7816, encoded size: 1566, compression ratio: 4.99
+
+Blender quit
