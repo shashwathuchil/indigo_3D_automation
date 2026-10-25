@@ -100,7 +100,8 @@
       box-shadow: 0 2px 8px rgba(31, 161, 201, 0.3);
     }
 
-    .nav-status-pill {
+    .nav-status-pill,
+    .viewer-pill {
       background: var(--glass-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -115,6 +116,21 @@
       color: var(--text-secondary);
       box-shadow: 0 4px 20px rgba(0,0,0,0.25);
       pointer-events: auto;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .viewer-pill svg {
+      color: var(--accent-cyan, #1fa1c9);
+      flex-shrink: 0;
+    }
+    .viewer-pill #viewer-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--text-primary, #ffffff);
+      font-variant-numeric: tabular-nums;
     }
     .pulse-dot {
       width: 8px;
@@ -431,9 +447,18 @@
         <div class="brand-badge">A320neo</div>
       </div>
 
-      <div class="nav-status-pill">
-        <span class="pulse-dot"></span>
-        <span>FLIGHT 6E-2026 • RWY 27R</span>
+      <div class="nav-right">
+        <div class="viewer-pill" title="Unique visitors">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span id="viewer-count">—</span>
+          <span>VIEWS</span>
+        </div>
+        <div class="nav-status-pill">
+          <span class="pulse-dot"></span>
+          <span>FLIGHT 6E-2026 • RWY 27R</span>
+        </div>
       </div>
     </header>
 
@@ -725,6 +750,26 @@
 
       renderer.render(scene, camera);
     }
+
+    // Unique viewer counter — increments once per browser (localStorage flag),
+    // backed by the free Counter API since GitHub Pages is static-only.
+    (function trackUniqueViewer() {
+      const el = document.getElementById('viewer-count');
+      const NS = 'shashwathuchil-indigo3d';
+      const KEY = 'a320neo_unique_viewer';
+      const fmt = n => Number(n).toLocaleString('en-US');
+      const alreadySeen = localStorage.getItem(KEY);
+      const url = alreadySeen
+        ? `https://api.counterapi.dev/v1/${NS}/unique-views`
+        : `https://api.counterapi.dev/v1/${NS}/unique-views/up`;
+      fetch(url)
+        .then(r => r.json())
+        .then(d => {
+          el.textContent = fmt(d.count);
+          if (!alreadySeen) localStorage.setItem(KEY, '1');
+        })
+        .catch(() => { el.textContent = '—'; });
+    })();
 
     animate();
   </script>
