@@ -751,22 +751,16 @@
       renderer.render(scene, camera);
     }
 
-    // Unique viewer counter — increments once per browser (localStorage flag),
-    // backed by the free Counter API since GitHub Pages is static-only.
+    // Unique viewer counter — visitorbadge.io dedupes server-side (each visitor
+    // counts once), which works from a static GitHub Pages site with no backend.
     (function trackUniqueViewer() {
       const el = document.getElementById('viewer-count');
-      const NS = 'shashwathuchil-indigo3d';
-      const KEY = 'a320neo_unique_viewer';
       const fmt = n => Number(n).toLocaleString('en-US');
-      const alreadySeen = localStorage.getItem(KEY);
-      const url = alreadySeen
-        ? `https://api.counterapi.dev/v1/${NS}/unique-views`
-        : `https://api.counterapi.dev/v1/${NS}/unique-views/up`;
-      fetch(url)
-        .then(r => r.json())
-        .then(d => {
-          el.textContent = fmt(d.count);
-          if (!alreadySeen) localStorage.setItem(KEY, '1');
+      fetch('https://api.visitorbadge.io/api/visitors?path=shashwathuchil-indigo3d')
+        .then(r => r.text())
+        .then(svg => {
+          const m = svg.match(/VISITORS: ([\d,]+)/);
+          el.textContent = m ? fmt(m[1].replace(/,/g, '')) : '—';
         })
         .catch(() => { el.textContent = '—'; });
     })();
